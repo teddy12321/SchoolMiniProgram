@@ -1,6 +1,8 @@
-from flask import  jsonify
-from data import app
+from flask import  jsonify,request
+from pip._vendor import requests
 
+from data import app
+from data import db
 # @app.route('/')
 # def root():
 #    return 'root'
@@ -47,6 +49,15 @@ def exams(name):
    print(exam1)
    return jsonify(exam1.getDic())
 
+@app.route('/exams')
+def examsall():
+   exam1 = Exam.query.all()
+   res = []
+   for exam in exam1:
+      res.append(exam.getDic())
+   print(exam1)
+   return jsonify(res)
+
 @app.route('/examprep')
 def examprep():
    prep1 = ExamPrep.query.filter(ExamPrep.id == 1).first()
@@ -55,8 +66,10 @@ def examprep():
 
 @app.route('/weather')
 def weather():
-   tdweather = {"date": " ", "weather": " ", "PM2.5": " "}
-   return jsonify(tdweather)
+   url = f'http://wthrcdn.etouch.cn/weather_mini?citykey=101030100'
+   res = requests.get(url)
+   # tdweather = {"date": " ", "weather": " ", "PM2.5": " "}
+   return jsonify(res.json())
 
 # @app.route('/login')
 # def login():
@@ -71,10 +84,20 @@ def stuinfo(stuno):
    return jsonify(stu1.getDic())
 
 
-@app.route('/applyabsent')
+@app.route('/applyabsent',methods=['POST'])
 def absent():
-   absentData = Absent.query.filter(Absent.id == 1).first()
-   return jsonify(absentData)
+   req = request.json
+   periods = req.get('periods')
+   date = req.get('date')
+   print(date)
+   for period in periods:
+      print(period)
+      absent = Absent(period,date)
+      db.session.add(absent)
+   db.session.commit()
+   return jsonify({'res':True})
+
+
 
 
 if __name__ == '__main__':
