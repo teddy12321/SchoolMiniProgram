@@ -31,7 +31,7 @@ class Student(db.Model):
         self.engName = engName
     def __str__(self):
         return '姓名:%s' % (self.name)
-
+#List????
     def getDic(self):
         stuinfos = {"name": self.name,
                     "code": self.stuNo,

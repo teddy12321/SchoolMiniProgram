@@ -13,9 +13,15 @@ from data import app
 #       testList.append(testDic)
 #    return jsonify(testList)
 #
+from model.absent import Absent
+from model.classs import Classs
 from model.student import Student
 from model.exam import Exam
 from model.examprep import ExamPrep
+from model.schedule import Schedule
+from model.acti import Acti
+from model.weather import Weather
+from model.delAbsent import DelAbsent
 
 
 @app.route('/acti/<date>')
@@ -64,12 +70,11 @@ def stuinfo(stuno):
    print(stu1)
    return jsonify(stu1.getDic())
 
-#location?
 
 @app.route('/applyabsent')
 def absent():
-   absentList = []
-   return jsonify(absentList)
+   absentData = Absent.query.filter(Absent.id == 1).first()
+   return jsonify(absentData)
 
 
 if __name__ == '__main__':

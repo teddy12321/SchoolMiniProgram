@@ -6,6 +6,8 @@ from model.schedule import Schedule
 from model.examprep import ExamPrep
 db.create_all()
 
+
+
 class1 = Classs('高一1班')
 class2 = Classs('高二1班')
 class3 = Classs('高三1班')
