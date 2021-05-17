@@ -24,24 +24,22 @@ from model.schedule import Schedule
 from model.acti import Acti
 from model.weather import Weather
 from model.delAbsent import DelAbsent
+from model.user import User
 
+@app.route('/acti')
+def recentActi():
+   actis = Acti.query.all()
+   res = []
+   for acti in actis:
+      res.append(acti.getDic())
+   print(res)
+   return jsonify(res)
 
-@app.route('/acti/<date>')
-def recentActi(date):
-   actisList = [{"date": "2020.10.31", "name": "Halloween", "summary": " ", "img:": ""},
-                {"date": "2020.12.24", "name": "Christmas", "summary": " ", "img:": ""},
-                {"date": "2021.3.14", "name": "Pi-day", "summary": " ", "img:": ""}]
-   return jsonify(actisList)
-
-@app.route('/schedule')
-def classSchedule():
-   Monday = ["Chi", "ELC", "ELL", "Cap", "Calc-BC", "Chem", "PBL", "PE", "Self-study"]
-   Tuesday = ["Chi", "ELC", "ELL", "Cap", "Calc-BC", "Chem", "PBL", "PE", "Self-study"]
-   Wednesday = ["Chi", "ELC", "ELL", "Cap", "Calc-BC", "Chem", "PBL", "PE", "Self-study"]
-   Thursday = ["Chi", "ELC", "ELL", "Cap", "Calc-BC", "Chem", "PBL", "PE", "Self-study"]
-   Friday = ["Chi", "ELC", "ELL", "Cap", "Calc-BC", "Chem", "PBL", "PE", "Self-study"]
-   classList = [Monday, Tuesday, Wednesday, Thursday, Friday]
-   return jsonify(classList)
+@app.route('/schedule/<stuno>')
+def classSchedule(stuno):
+   stu = Student.query.filter(Student.stuNo == stuno).first()
+   schedule = Schedule.query.filter(Schedule.id == stu.getType()).first()
+   return jsonify(schedule.construct())
 
 @app.route('/exams/<name>')
 def exams(name):
@@ -97,7 +95,43 @@ def absent():
    db.session.commit()
    return jsonify({'res':True})
 
+@app.route('/checkid', methods = ['POST'])
+def checkId():
+   req = request.json
+   openid = req.get('openid')
+   print(openid)
+   stuno = ""
+   stu = User.query.filter(User.openid==openid).first()
+   if(stu != None):
+      if(stu.stuNo != None):
+         stuno = stu.stuNo
+   else:
+      newusr = User(openid, None)
+      db.session.add(newusr)
+      db.session.commit()
 
+   return jsonify({'res':True,
+                   'stuno': stuno
+                   })
+@app.route('/postid', methods = ['POST'])
+def postId():
+   req = request.json
+   openid = req.get('openid')
+   stuno = req.get('stuNo')
+   name = req.get('name')
+   stu = Student.query.filter(Student.stuNo == stuno).filter(Student.name == name).first()
+   if(stu != None):
+      usr = User.query.filter(User.openid == openid).first()
+      if(usr != None):
+         usr.stuNo = stuno
+         db.session.commit()
+         return jsonify({'res': True})
+      else:
+         newusr = User(openid, stuno)
+         db.session.add(newusr)
+         db.session.commit()
+         return jsonify({'res': True})
+   return jsonify({'res': False})
 
 
 if __name__ == '__main__':

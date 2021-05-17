@@ -21,3 +21,4 @@ class Acti(db.Model):
                 "summary": self.summary,
                 "img": self.img
                     }
+        return exam

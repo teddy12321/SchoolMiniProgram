@@ -19,4 +19,4 @@ class Exam(db.Model):
                 "date": self.date,
                 "subject": self.subject,
                     }
-        return  exam
+        return exam

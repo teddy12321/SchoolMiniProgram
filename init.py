@@ -5,10 +5,13 @@ from model.exam import Exam
 from model.absent import Absent
 from model.schedule import Schedule
 from model.examprep import ExamPrep
+from model.acti import Acti
+from model.user import User
 db.create_all()
 
-
-
+openid1 = User('qwertyuiop', '201901003')
+# acti1 = Acti('q', 'w', 'e', 'r')
+#
 # class1 = Classs('高一1班')
 # class2 = Classs('高二1班')
 # class3 = Classs('高三1班')
@@ -32,12 +35,14 @@ db.create_all()
 #                                "file": [{"bkname": "Barron", "bkfile": " "}, {"bkname": "5 steps", "bkfile": " "}]},
 #                               {"name": "BPHO",
 #                                "file": [{"bkname": "Barron", "bkfile": " "}, {"bkname": "5 steps", "bkfile": " "}]}]}])
-# # db.session.add(chenrun)
-# # db.session.add(chenyufan)
-# # db.session.add(zhaojinxing)
-# # db.session.add(examprepList)
+# db.session.add(chenrun)
+# db.session.add(chenyufan)
+# db.session.add(zhaojinxing)
+# db.session.add(examprepList)
 # db.session.add(euclid)
 # db.session.add(comc)
 # db.session.add(bpho)
+# db.session.add(acti1)
+db.session.add(openid1)
 db.session.commit()
 
