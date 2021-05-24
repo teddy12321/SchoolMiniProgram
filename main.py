@@ -113,12 +113,34 @@ def checkId():
    return jsonify({'res':True,
                    'stuno': stuno
                    })
+
+nameList = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
+
+@app.route('/checkdayschedule', methods = ['POST'])
+def checkDaySchedule():
+   schList = []
+   req = request.json
+   stuNo = req.get('stu')
+   pos = req.get('day')
+   stu = Student.query.filter(Student.stuNo==stuNo).first()
+   type = stu.getType()
+   schedule = Schedule.query.filter(Schedule.id == type).first()
+   for i in range(1,10):
+      schList.append(getattr(schedule,nameList[pos]+str(i),''))
+
+   return jsonify({'res':True,
+                   'data': schList
+                   })
+
 @app.route('/postid', methods = ['POST'])
 def postId():
    req = request.json
+   print(req)
    openid = req.get('openid')
-   stuno = req.get('stuNo')
+   stuno = req.get('stuno')
    name = req.get('name')
+   print(stuno)
+   print(name)
    stu = Student.query.filter(Student.stuNo == stuno).filter(Student.name == name).first()
    if(stu != None):
       usr = User.query.filter(User.openid == openid).first()
