@@ -82,18 +82,18 @@ def stuinfo(stuno):
    return jsonify(stu1.getDic())
 
 
-@app.route('/applyabsent',methods=['POST'])
-def absent():
-   req = request.json
-   periods = req.get('periods')
-   date = req.get('date')
-   print(date)
-   for period in periods:
-      print(period)
-      absent = Absent(period,date)
-      db.session.add(absent)
-   db.session.commit()
-   return jsonify({'res':True})
+# @app.route('/applyabsent',methods=['POST'])
+# def absent():
+#    req = request.json
+#    periods = req.get('periods')
+#    date = req.get('date')
+#    print(date)
+#    for period in periods:
+#       print(period)
+#       absent = Absent(period,date)
+#       db.session.add(absent)
+#    db.session.commit()
+#    return jsonify({'res':True})
 
 @app.route('/checkid', methods = ['POST'])
 def checkId():
@@ -122,15 +122,18 @@ def checkDaySchedule():
    req = request.json
    stuNo = req.get('stu')
    pos = req.get('day')
-   stu = Student.query.filter(Student.stuNo==stuNo).first()
-   type = stu.getType()
-   schedule = Schedule.query.filter(Schedule.id == type).first()
-   for i in range(1,10):
-      schList.append(getattr(schedule,nameList[pos]+str(i),''))
-
-   return jsonify({'res':True,
-                   'data': schList
-                   })
+   if(stuNo):
+      stu = Student.query.filter(Student.stuNo==stuNo).first()
+      type = stu.getType()
+      schedule = Schedule.query.filter(Schedule.id == type).first()
+      for i in range(1,10):
+         schList.append(getattr(schedule,nameList[pos]+str(i),''))
+      return jsonify({'res': True,
+                      'data': schList
+                      })
+   else:
+      return jsonify({'res': False,
+                      })
 
 @app.route('/postid', methods = ['POST'])
 def postId():
@@ -154,6 +157,34 @@ def postId():
          db.session.commit()
          return jsonify({'res': True})
    return jsonify({'res': False})
+
+@app.route('/postapplyabsent', methods = ['POST'])
+def postApplyAbsent():
+   req = request.json
+   print(req)
+   stuno = req.get('stuno')
+   date = req.get('date')
+   classapply = req.get('classapply')
+   stu = Student.query.filter(Student.stuNo == stuno).first()
+   for i,period in enumerate(classapply):
+      if period:
+         abs = Absent.query.filter(Absent.Student == stu) \
+            .filter(Absent.date == date) \
+            .filter(Absent.period == i + 1).first()
+         if not  abs:
+            absent = Absent(i+1, date, stu)
+            db.session.add(absent)
+            db.session.commit()
+      else:
+         abs = Absent.query.filter(Absent.Student == stu)\
+            .filter(Absent.date == date) \
+            .filter(Absent.period == i+1).first()
+         if abs:
+            db.session.delete(abs)
+            db.session.commit()
+
+   return jsonify({'res': True})
+
 
 
 if __name__ == '__main__':

@@ -9,7 +9,7 @@ from model.acti import Acti
 from model.user import User
 db.create_all()
 
-openid1 = User('qwertyuiop', '201901003')
+# openid1 = User('qwertyuiop', '201901003')
 # acti1 = Acti('q', 'w', 'e', 'r')
 #
 # class1 = Classs('高一1班')
@@ -43,6 +43,8 @@ openid1 = User('qwertyuiop', '201901003')
 # db.session.add(comc)
 # db.session.add(bpho)
 # db.session.add(acti1)
-db.session.add(openid1)
+# db.session.add(openid1)
+abs1 = Absent(2,'2021.6.1', Student.query.filter(Student.stuNo == '201901003').first())
+db.session.add(abs1)
 db.session.commit()
 
