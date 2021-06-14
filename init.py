@@ -7,6 +7,8 @@ from model.schedule import Schedule
 from model.examprep import ExamPrep
 from model.acti import Acti
 from model.user import User
+from model.admin import Admin
+from model.checkIn import CheckIn
 db.create_all()
 
 # openid1 = User('qwertyuiop', '201901003')
@@ -14,11 +16,11 @@ db.create_all()
 #
 # class1 = Classs('高一1班')
 # class2 = Classs('高二1班')
-# class3 = Classs('高三1班')
-# db.session.add(class1)
-# db.session.add(class3)
+# # class3 = Classs('高三1班')
+# # db.session.add(class1)
+# # db.session.add(class3)
 # s1 = Schedule('1','1','1','1','1','1','1','1','1','2','2','2','2','2','2','2','2','2','3','3','3','3','3','3','3','3','3','4','4','4','4','4','4','4','4','4','5','5','5','5','5','5','5','5','5')
-# s2 = Schedule('2','1','1','1','1','1','1','1','1','2','2','2','2','2','2','2','2','2','3','3','3','3','3','3','3','3','3','4','4','4','4','4','4','4','4','4','5','5','5','5','5','5','5','5','5')
+# # s2 = Schedule('2','1','1','1','1','1','1','1','1','2','2','2','2','2','2','2','2','2','3','3','3','3','3','3','3','3','3','4','4','4','4','4','4','4','4','4','5','5','5','5','5','5','5','5','5')
 # chenrun = Student('陈润','201901003',class2,s1, 0, 1,2,'get to work!', 'trdfhg', 'Ben')
 # chenyufan = Student('陈禹帆','201901007',class2, s1,0, 3,5,'wake up!', 'asfhg', 'Peter')
 # zhaojinxing = Student('赵金星','201901004',class2, s2, 0, 0,0,'!', 'rgdfhg', 'Tony')
@@ -44,7 +46,10 @@ db.create_all()
 # db.session.add(bpho)
 # db.session.add(acti1)
 # db.session.add(openid1)
-abs1 = Absent(2,'2021.6.1', Student.query.filter(Student.stuNo == '201901003').first())
-db.session.add(abs1)
+checkIn1 = CheckIn('2021.6.1','07:58', Student.query.filter(Student.stuNo == '201901003').first())
+# db.session.add(abs1)
+# admin = Admin('dfgu')
+# db.session.add(admin)
+db.session.add(checkIn1)
 db.session.commit()
 

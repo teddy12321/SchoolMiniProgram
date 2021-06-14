@@ -25,6 +25,9 @@ from model.acti import Acti
 from model.weather import Weather
 from model.delAbsent import DelAbsent
 from model.user import User
+from model.admin import Admin
+from model.checkIn import CheckIn
+
 
 @app.route('/acti')
 def recentActi():
@@ -119,17 +122,26 @@ nameList = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 @app.route('/checkdayschedule', methods = ['POST'])
 def checkDaySchedule():
    schList = []
+   absList = [False,False,False,False,False,False,False,False,False]
+
    req = request.json
    stuNo = req.get('stu')
    pos = req.get('day')
+   date = req.get('date')
    if(stuNo):
       stu = Student.query.filter(Student.stuNo==stuNo).first()
       type = stu.getType()
       schedule = Schedule.query.filter(Schedule.id == type).first()
       for i in range(1,10):
          schList.append(getattr(schedule,nameList[pos]+str(i),''))
+      absents = Absent.query.filter(Absent.Student == stu) \
+         .filter(Absent.date == date) \
+         .all()
+      for absent in absents:
+         absList[absent.period-1] = True
       return jsonify({'res': True,
-                      'data': schList
+                      'data': schList,
+                      'dayabsent': absList
                       })
    else:
       return jsonify({'res': False,
@@ -145,6 +157,8 @@ def postId():
    print(stuno)
    print(name)
    stu = Student.query.filter(Student.stuNo == stuno).filter(Student.name == name).first()
+   if(stuno=='000000000' and name=='administrator'):
+      return jsonify({'res': 'More'})
    if(stu != None):
       usr = User.query.filter(User.openid == openid).first()
       if(usr != None):
@@ -184,6 +198,40 @@ def postApplyAbsent():
             db.session.commit()
 
    return jsonify({'res': True})
+
+@app.route('/admincheck', methods = ['POST'])
+def adminCheck():
+   req = request.json
+   print(req)
+   openid = req.get('openid')
+   pwd = req.get('pwd')
+   if (pwd=='AP2021'):
+      newAdmin = Admin(openid)
+      db.session.add(newAdmin)
+      db.session.commit()
+   return jsonify({'res': True})
+
+
+@app.route('/findadmin',methods = ['POST'])
+def findAdmin():
+   req = request.json
+   print(req)
+   openid = req.get('openid')
+   admin = Admin.query.filter(Admin.openid == openid).first()
+   if (admin != None):
+      return jsonify({'res': True})
+
+   return jsonify({'res': False})
+
+
+@app.route('/checkin', methods = ['POST'])
+def checkIn():
+   req = request.json
+   print(req)
+   stuno = req.get('stuno')
+   stu = Student.query.filter(Student.stuNo == stuno).first()
+   newCheckin  = CheckIn('2020-10-1','07：58', stu)
+
 
 
 

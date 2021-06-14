@@ -15,7 +15,6 @@ class Absent(db.Model):
         self.Student = stu
         self.isCompleted = False
 
-
     def __str__(self):
         return '名称:%s' % (self.d1)
 
