@@ -1,6 +1,6 @@
 from flask import  jsonify,request
 from pip._vendor import requests
-
+import datetime
 from data import app
 from data import db
 # @app.route('/')
@@ -27,6 +27,8 @@ from model.delAbsent import DelAbsent
 from model.user import User
 from model.admin import Admin
 from model.checkIn import CheckIn
+
+STDLATETIME = '07:50:00'
 
 
 @app.route('/acti')
@@ -230,9 +232,36 @@ def checkIn():
    print(req)
    stuno = req.get('stuno')
    stu = Student.query.filter(Student.stuNo == stuno).first()
-   newCheckin  = CheckIn('2020-10-1','07：58', stu)
+   now = datetime.datetime.now()
+   date = now.strftime("%Y-%m-%d")
+   time = now.strftime("%H:%M:%S")
+   newCheckin = CheckIn(date,time, stu)
+   db.session.add(newCheckin)
+   db.session.commit()
+   return jsonify({'res': True})
 
-
+@app.route('/checkcheckin', methods = ['POST'])
+def checkCheckIn():
+   isLate = False
+   isChecked = False
+   req = request.json
+   print(req)
+   stuno = req.get('stuno')
+   stu = Student.query.filter(Student.stuNo == stuno).first()
+   now = datetime.datetime.now()
+   date = now.strftime("%Y-%m-%d")
+   time = now.strftime("%H:%M:%S")
+   check = CheckIn.query.filter(CheckIn.stuid == stu.id).filter(CheckIn.date == date).first()
+   if check != None:
+      isChecked = True
+      if check.time > STDLATETIME:
+         isLate = True
+   else:
+      if time > STDLATETIME:
+         isLate = True
+   return jsonify({'isChecked': isChecked,
+                   'isLate': isLate
+                   })
 
 
 if __name__ == '__main__':
