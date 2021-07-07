@@ -27,6 +27,7 @@ from model.delAbsent import DelAbsent
 from model.user import User
 from model.admin import Admin
 from model.checkIn import CheckIn
+from model.scheduleTemplate import ScheduleTemplate
 
 STDLATETIME = '07:50:00'
 
@@ -43,8 +44,15 @@ def recentActi():
 @app.route('/schedule/<stuno>')
 def classSchedule(stuno):
    stu = Student.query.filter(Student.stuNo == stuno).first()
-   schedule = Schedule.query.filter(Schedule.id == stu.getType()).first()
-   return jsonify(schedule.construct())
+   scheduleId = stu.getSchedule()
+   res = {}
+   if scheduleId:
+      schedule = Schedule.query.filter(Schedule.id == stu.getSchedule()).first()
+      res = {"selected": True, "schedule": schedule.construct()}
+   else:
+      temp = ScheduleTemplate.query.filter(ScheduleTemplate.classs == stu.classs).first()
+      res = {"selected": False, "schedule": temp.construct()}
+   return jsonify(res)
 
 @app.route('/exams/<name>')
 def exams(name):
@@ -262,6 +270,19 @@ def checkCheckIn():
    return jsonify({'isChecked': isChecked,
                    'isLate': isLate
                    })
+
+@app.route('/scheduletemplate/<stuno>')
+def scheduletemplate(stuno):
+   stu1 = Student.query.filter(Student.stuNo==stuno).first()
+   temps = ScheduleTemplate.query.filter(ScheduleTemplate.classs ==stu1.classs).all()
+   res = []
+   for temp in temps:
+      print(temp.__dict__)
+      tmp = temp.__dict__
+      tmp.pop('_sa_instance_state')
+      res.append(tmp)
+   return jsonify(res)
+
 
 
 if __name__ == '__main__':

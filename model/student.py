@@ -7,9 +7,11 @@ class Student(db.Model):
     gender = db.Column(db.Integer,nullable=False)
     daysLate = db.Column(db.Integer, nullable = False)
     daysAbsent = db.Column(db.Integer, nullable = False)
-    memo = db.Column(db.String(100),nullable = False)
-    avatar = db.Column(db.String(5000),nullable = False)
+    memo = db.Column(db.String(100),nullable = True)
+    avatar = db.Column(db.String(5000),nullable = True)
     engName = db.Column(db.String(100), nullable=False)
+    year = db.Column(db.Integer, nullable = False)
+    pinyin =  db.Column(db.String(100), nullable=False)
     #外键
     classId = db.Column(db.Integer,db.ForeignKey("class.id"))
     classs = db.relationship("Classs",backref=db.backref("students"))
@@ -18,7 +20,7 @@ class Student(db.Model):
     scheduleId = db.Column(db.Integer,db.ForeignKey("schedule.id"))
     schedule = db.relationship("Schedule",backref=db.backref("students"))
 
-    def __init__(self,name,stuNo, classs= None,schedule = None,gender=0, daysLate = 0, daysAbsent = 0, memo = " ", avatar = " ", engName = " "):
+    def __init__(self,name,stuNo,year,schedule, classs,gender, daysLate, daysAbsent, memo, avatar, engName, pinyin):
         self.name = name
         self.classs = classs
         self.stuNo = stuNo
@@ -29,10 +31,13 @@ class Student(db.Model):
         self.schedule = schedule
         self.avatar = avatar
         self.engName = engName
+        self.year = year
+        self.pinyin = pinyin
+
     def __str__(self):
         return '姓名:%s' % (self.name)
 
-    def getType(self):
+    def getSchedule(self):
         type = self.scheduleId
         return type
 
