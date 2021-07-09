@@ -140,7 +140,7 @@ def checkDaySchedule():
    date = req.get('date')
    if(stuNo):
       stu = Student.query.filter(Student.stuNo==stuNo).first()
-      type = stu.getType()
+      type = stu.getSchedule()
       schedule = Schedule.query.filter(Schedule.id == type).first()
       for i in range(1,10):
          schList.append(getattr(schedule,nameList[pos]+str(i),''))
@@ -168,6 +168,9 @@ def postId():
    print(name)
    stu = Student.query.filter(Student.stuNo == stuno).filter(Student.name == name).first()
    if(stuno=='000000000' and name=='administrator'):
+      newusr = User(openid, stuno)
+      db.session.add(newusr)
+      db.session.commit()
       return jsonify({'res': 'More'})
    if(stu != None):
       usr = User.query.filter(User.openid == openid).first()
@@ -283,6 +286,19 @@ def scheduletemplate(stuno):
       res.append(tmp)
    return jsonify(res)
 
+@app.route('/postschedule', methods = ['POST'])
+def postschedule():
+   req = request.json
+   print(req)
+   stuno = req.get('stuno')
+   schedule = req.get('schedule')
+   stu1 = Student.query.filter(Student.stuNo == stuno).first()
+   newsch = Schedule(*schedule)
+   stu1.schedule = newsch
+   db.session.add(newsch)
+   db.session.commit()
+   return jsonify({'res': True
+                   })
 
 
 if __name__ == '__main__':

@@ -54,7 +54,7 @@ class ScheduleTemplate(db.Model):
 
     def construct(self):
         monday = [self.mon1, self.mon2, self.mon3, self.mon4, self.mon5, self.mon6, self.mon7, self.mon8, self.mon9]
-        tuesday = [self.tue1, self.tue2, self.tue3, self.tue4,self.tue5,self.tue6,self.tue7]
+        tuesday = [self.tue1, self.tue2, self.tue3, self.tue4,self.tue5,self.tue6,self.tue7,self.tue8,self.tue9]
         wednesday = [self.wed1, self.wed2, self.wed3, self.wed4, self.wed5, self.wed6, self.wed7, self.wed8, self.wed9]
         thursday = [self.thu1, self.thu2, self.thu3, self.thu4, self.thu5, self.thu6, self.thu7, self.thu8, self.thu9]
         friday = [self.fri1, self.fri2, self.fri3, self.fri4, self.fri5, self.fri6, self.fri7, self.fri8, self.fri9]

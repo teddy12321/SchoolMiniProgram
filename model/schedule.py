@@ -60,8 +60,9 @@ class Schedule(db.Model):
         return overall
 
     def makeData(self,datas):
-        if(len(datas)<45):
+        if(len(datas)<43):
             return False
+        print(datas)
         self.mon1 = datas[0]
         self.mon2 = datas[1]
         self.mon3 = datas[2]
