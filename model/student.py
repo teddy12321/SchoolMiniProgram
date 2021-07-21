@@ -41,6 +41,12 @@ class Student(db.Model):
         type = self.scheduleId
         return type
 
+    def getName(self):
+        return self.name
+
+    def getstuNo(self):
+        return  self.stuNo
+
     def getDic(self):
         stuinfos = {"name": self.name,
                     "code": self.stuNo,

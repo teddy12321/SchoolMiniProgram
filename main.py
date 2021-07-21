@@ -48,11 +48,34 @@ def classSchedule(stuno):
    res = {}
    if scheduleId:
       schedule = Schedule.query.filter(Schedule.id == stu.getSchedule()).first()
-      res = {"selected": True, "schedule": schedule.construct()}
+      res = {"selected": True, "schedule": schedule.construct(), "isStu": True}
    else:
       temp = ScheduleTemplate.query.filter(ScheduleTemplate.classs == stu.classs).first()
-      res = {"selected": False, "schedule": temp.construct()}
+      res = {"selected": False, "schedule": temp.construct(), "isStu": True}
    return jsonify(res)
+
+@app.route('/teacherschedule')
+def teacherSchedule():
+   stus = Student.query.all()
+   res = []
+   for stu in stus:
+      scheduleId = stu.getSchedule()
+      if scheduleId:
+         schedule = Schedule.query.filter(Schedule.id == stu.getSchedule()).first()
+         res.append({"Name": stu.getName(), "schedule": schedule.construct()})
+      else:
+         res.append({"Name": stu.getName(), "schedule": ''})
+   print(res)
+   return jsonify(res)
+
+@app.route('/allstu')
+def allStu():
+   stus = Student.query.all()
+   res = []
+   for stu in stus:
+      res.append({"Name": stu.getName(), "stuNo": stu.getstuNo(), "Class": stu.classs.name})
+   return jsonify(res)
+
 
 @app.route('/exams/<name>')
 def exams(name):
@@ -222,7 +245,8 @@ def adminCheck():
       newAdmin = Admin(openid)
       db.session.add(newAdmin)
       db.session.commit()
-   return jsonify({'res': True})
+      return jsonify({'res': True})
+   return jsonify({'res': False})
 
 
 @app.route('/findadmin',methods = ['POST'])
@@ -233,7 +257,6 @@ def findAdmin():
    admin = Admin.query.filter(Admin.openid == openid).first()
    if (admin != None):
       return jsonify({'res': True})
-
    return jsonify({'res': False})
 
 
