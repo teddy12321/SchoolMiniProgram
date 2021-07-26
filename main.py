@@ -215,6 +215,8 @@ def postApplyAbsent():
    stuno = req.get('stuno')
    date = req.get('date')
    classapply = req.get('classapply')
+   className = req.get('className')
+   print(className)
    stu = Student.query.filter(Student.stuNo == stuno).first()
    for i,period in enumerate(classapply):
       if period:
@@ -222,7 +224,7 @@ def postApplyAbsent():
             .filter(Absent.date == date) \
             .filter(Absent.period == i + 1).first()
          if not  abs:
-            absent = Absent(i+1, date, stu)
+            absent = Absent(i+1, date, stu, className[i])
             db.session.add(absent)
             db.session.commit()
       else:
@@ -319,6 +321,43 @@ def postschedule():
    newsch = Schedule(*schedule)
    stu1.schedule = newsch
    db.session.add(newsch)
+   db.session.commit()
+   return jsonify({'res': True
+                   })
+
+
+@app.route('/getdayabs', methods = ['POST'])
+def getDayAbs():
+   req = request.json
+   date = req.get('date')
+   abss = Absent.query.filter(Absent.date == date).all()
+   res = []
+   for abs in abss:
+      res.append({'Name': abs.Student.name, 'ClassName': abs.className, 'id': abs.id, 'Period': abs.period, 'isCompleted': abs.isCompleted})
+   return jsonify(res)
+
+
+@app.route('/postdayabs', methods = ['POST'])
+def postDayAbs():
+   req = request.json
+   id = req.get('id')
+   print(id)
+   isCompleted = req.get('isCompleted')
+   abs = Absent.query.filter(Absent.id == id).first()
+   abs.isCompleted = isCompleted
+   db.session.commit()
+   return jsonify({'res': True
+                   })
+
+
+@app.route('/authorizeall' , methods = ['POST'])
+def authorizeAll():
+   req = request.json
+   date = req.get('date')
+   print(date)
+   abss = Absent.query.filter(Absent.date == date).all()
+   for abs in abss:
+      abs.isCompleted = True
    db.session.commit()
    return jsonify({'res': True
                    })

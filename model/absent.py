@@ -5,16 +5,17 @@ class Absent(db.Model):
     period = db.Column(db.Integer, nullable=False)
     date = db.Column(db.String(100), nullable=False)
     isCompleted = db.Column(db.Boolean, nullable=False)
+    className = db.Column(db.String(100), nullable=False)
     stuid = db.Column(db.Integer,db.ForeignKey("student.id"))
     Student = db.relationship("Student",backref=db.backref("absents"))
 
 
-    def __init__(self, period, date, stu):
+    def __init__(self, period, date, stu, clsname):
         self.period = period
         self.date = date
         self.Student = stu
         self.isCompleted = False
-
+        self.className = clsname
     def __str__(self):
         return '名称:%s' % (self.d1)
 
