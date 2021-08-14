@@ -100,7 +100,7 @@ def examprep():
 
 @app.route('/weather')
 def weather():
-   url = f'http://wthrcdn.etouch.cn/weather_mini?citykey=101030100'
+   url = 'http://wthrcdn.etouch.cn/weather_mini?citykey=101030100'
    res = requests.get(url)
    # tdweather = {"date": " ", "weather": " ", "PM2.5": " "}
    return jsonify(res.json())
@@ -299,6 +299,36 @@ def checkCheckIn():
                    'isLate': isLate
                    })
 
+@app.route('/admincheckin')
+def adminCheckIn():
+   stus = Student.query.all()
+   now = datetime.datetime.now()
+   date = now.strftime("%Y-%m-%d")
+   time = now.strftime("%H:%M:%S")
+   latestus = []
+   uncheckedstus = []
+
+   for stu in stus:
+      isChecked = False
+      isLate = False
+      check = CheckIn.query.filter(CheckIn.stuid == stu.id).filter(CheckIn.date == date).first()
+      if check != None:
+         isChecked = True
+         if check.time > STDLATETIME:
+            isLate = True
+      else:
+         if time > STDLATETIME:
+            isLate = True
+      if(isChecked == False):
+         uncheckedstus.append({"class": stu.classs.name, "name": stu.getName()})
+      elif (isLate == False):
+         uncheckedstus.append({"class": stu.classs.name, "name": stu.getName()})
+   res = {"Late": latestus, "Unchecked" : uncheckedstus}
+   return jsonify(res)
+
+
+
+
 @app.route('/scheduletemplate/<stuno>')
 def scheduletemplate(stuno):
    stu1 = Student.query.filter(Student.stuNo==stuno).first()
@@ -364,4 +394,4 @@ def authorizeAll():
 
 
 if __name__ == '__main__':
-   app.run(host='0.0.0.0',port=8000)
+   app.run(host='0.0.0.0',port=443, ssl_context=('secret.pem', 'secret.key'))
