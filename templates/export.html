@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="static/css/bootstrap.min.css" />
+<link rel="stylesheet" href="static/css/bootstrap-datetimepicker.min.css"></link>
+</head>
+<style>
+.width200{width:200px;}
+</style>
+<body>
+<form class="form-inline" action="exportdata" method="post">
+  <div class="form-group">
+    <label for="start_id">选择开始日期</label>
+    <input name="start" id="start_id" type="text"   class="form-control width200" placeholder="请选择开始时间">
+  </div>
+    <div class="form-group">
+    <label for="end_id">选择开始日期</label>
+    <input  id="end_id"  type="text" readonly  class="form-control width200" placeholder="请选择结束时间">
+  </div>
+  <button type="submit" class="btn btn-default">导出</button>
+</form>
+
+
+</body>
+<script src="static/js/jquery-1.8.3.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>
+<script src="static/js/bootstrap-datetimepicker.min.js"></script>
+<script src="static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+<script>
+
+$(function(){
+    $("#start_id").datetimepicker({
+        format: 'yyyy-mm-dd',//显示格式
+        startView:2,
+        minView:2,
+        maxView :2,
+        language: 'zh-CN',
+        autoclose: 1,//选择后自动关闭
+        clearBtn:true,//清除按钮
+    });
+    $("#end_id").datetimepicker({
+        format: 'yyyy-mm-dd',//显示格式
+        startView:2,
+        minView:2,
+        maxView :2,
+        language: 'zh-CN',
+        autoclose: 1,//选择后自动关闭
+        clearBtn:true,//清除按钮
+    });
+    // 获取当前日期
+    var date = new Date();
+
+    // 获取当前月份
+    var nowMonth = date.getMonth() + 1;
+
+    // 获取当前是几号
+    var strDate = date.getDate();
+
+    // 添加分隔符“-”
+    var seperator = "-";
+
+    // 对月份进行处理，1-9月在前面添加一个“0”
+    if (nowMonth >= 1 && nowMonth <= 9) {
+       nowMonth = "0" + nowMonth;
+    }
+
+    // 对月份进行处理，1-9号在前面添加一个“0”
+    if (strDate >= 0 && strDate <= 9) {
+       strDate = "0" + strDate;
+    }
+
+    // 最后拼接字符串，得到一个格式为(yyyy-MM-dd)的日期
+    var nowDate = date.getFullYear() + seperator + nowMonth + seperator + strDate;
+    $("#start_id").val(nowDate); //赋值
+
+
+    console.log($("#start_id").val()); //获取值
+
+});
+</script>
+</html>

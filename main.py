@@ -3,6 +3,12 @@ from pip._vendor import requests
 import datetime
 from data import app
 from data import db
+from flask import render_template
+import time
+from io import BytesIO
+from flask import send_file
+from openpyxl import Workbook
+from model.language import Language
 # @app.route('/')
 # def root():
 #    return 'root'
@@ -321,8 +327,8 @@ def adminCheckIn():
             isLate = True
       if(isChecked == False):
          uncheckedstus.append({"class": stu.classs.name, "name": stu.getName()})
-      elif (isLate == False):
-         uncheckedstus.append({"class": stu.classs.name, "name": stu.getName()})
+      elif (isLate == True):
+         latestus.append({"class": stu.classs.name, "name": stu.getName()})
    res = {"Late": latestus, "Unchecked" : uncheckedstus}
    return jsonify(res)
 
@@ -393,5 +399,84 @@ def authorizeAll():
                    })
 
 
+@app.route('/initlanguage' , methods = ['POST'])
+def initLanguage():
+   req = request.json
+   openid = req.get('openid')
+   lan = Language.query.filter(Language.openid == openid).first()
+   if(lan == None):
+      newusr = Language("English", openid)
+      db.session.add(newusr)
+      db.session.commit()
+      return jsonify({'language': newusr.getName()
+                      })
+   else:
+      name = lan.getName()
+      return jsonify({'language': name
+                   })
+
+@app.route('/changelanguage' , methods = ['POST'])
+def changeLanguage():
+   req = request.json
+   openid = req.get('openid')
+   name = req.get('name')
+   lan = Language.query.filter(Language.openid == openid).first()
+   if(name==lan.name):
+      return jsonify({'res': False
+                      })
+   lan.name = name
+   db.session.commit()
+   return jsonify({'language': name
+                   })
+
+
+@app.route('/export')
+def export():
+    return render_template('export.html')
+
+@app.route('/exportdata', methods = ['POST'])
+def exportdata():
+    start = request.form['start']
+    return export_excel(start, '')
+
+
+def export_excel(start,end):
+   """excel 报表导出"""
+   wb = Workbook()
+   sheet = wb.create_sheet(start)
+   # sheet = wb.active
+   ####################################
+   sheet.cell(row=1, column=1).value = "学号"
+   sheet.cell(row=1, column=2).value = "姓名"
+   sheet.cell(row=1, column=3).value = "签到时间"
+   stus = Student.query.all()
+   for i,stu in enumerate(stus):
+      sheet.cell(row=i+2, column=1).value = stu.stuNo
+      sheet.cell(row=i + 2, column=2).value = stu.getName()
+      checkin = CheckIn.query.filter(CheckIn.stuid == stu.id, CheckIn.date == start).first()
+      if checkin:
+         sheet.cell(row=i + 2, column=3).value = checkin.time
+      else:
+         sheet.cell(row=i + 2, column=3).value = "未打卡"
+   ####################################
+
+
+
+
+   # 使用字节流存储
+   output = BytesIO()
+   # 保存文件
+   wb.save(output)
+   output.seek(0)
+   filename = "%s.xlsx" % str(int(time.time()))
+   fv = send_file(output, as_attachment=True, attachment_filename=filename, conditional=True)
+   fv.headers['Content-Disposition'] += "; filename*=utf-8''{}".format(filename)
+   fv.headers["Cache-Control"] = "no_store"
+   fv.headers["max-age"] = 1
+
+
+   return fv
+
 if __name__ == '__main__':
-   app.run(host='0.0.0.0',port=443, ssl_context=('secret.pem', 'secret.key'))
+   #app.run(host='0.0.0.0',port=443, ssl_context=('top.pem', 'top.key'))
+   app.run(host='0.0.0.0',port=80)
